@@ -37,9 +37,9 @@ export async function updateRiddleInDB(id, updated) {
 
   const updatedRiddle = {
     id: existing.id,
-    name: updated.name ?? existing.name,
-    taskDescription: updated.taskDescription ?? existing.taskDescription,
-    correctAnswer: updated.correctAnswer ?? existing.correctAnswer,
+    name: updated.name,
+    taskDescription: updated.taskDescription,
+    correctAnswer: updated.correctAnswer,
   };
 
   await collection.findOneAndReplace({ id: existing.id }, updatedRiddle);

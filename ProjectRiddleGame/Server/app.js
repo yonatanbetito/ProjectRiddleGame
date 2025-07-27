@@ -8,6 +8,10 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log("appening", req.method, req.url);
+  next();
+});
 routsinit(app);
 
 const server = http.createServer(app);

@@ -7,20 +7,21 @@ export class Player {
     this.createdAt = new Date();
   }
 
+  getTotalScore() {
+    return this.scores.reduce((sum, score) => sum + score.time, 0);
+  }
+
   addScore(riddleId, time) {
     const score = {
       riddleId,
       time,
       date: new Date(),
     };
-
     this.scores.push(score);
     this.totalGames++;
-
     if (this.best_time === null || time < this.best_time) {
       this.best_time = time;
     }
-
     return score;
   }
 

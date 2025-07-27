@@ -1,18 +1,18 @@
 import { Riddle } from "../models/Riddle.js";
-import readlineSync from "readline-sync";
 import { getAllRiddles } from "./Riddle.services.js";
 import { submitScore, createPlayer } from "./Player.services.js";
 
-export default async function startGame(player) {
+const log_game = 2
+export default async function startGame(name) {
   try {
-    await createPlayer(player);
+    await createPlayer(name);
 
     const riddles = await getAllRiddles();
     console.log(`\nStarting game with ${riddles.length} riddles!\n`);
-
-    for (let i = 0; i < riddles.length; i++) {
+    
+    for (let i = 0; i <log_game; i++) {
       const riddle = riddles[i];
-      console.log(`\n--- Riddle ${i + 1} of ${riddles.length} ---`);
+      console.log(`\n--- Riddle ${i + 1} of ${log_game} ---`);
 
       const r = new Riddle(riddle);
       const start = Date.now();
@@ -20,8 +20,7 @@ export default async function startGame(player) {
       const end = Date.now();
       const time = Math.floor((end - start) / 1000);
 
-      await submitScore(player, riddle.id, time);
-      // console.log(`Time for this riddle: ${time}s`);
+      await submitScore(name, riddle.id, time);
     }
 
     console.log("Congratulations! You and game!!");

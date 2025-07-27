@@ -1,24 +1,18 @@
+import fetch from "node-fetch";
+
 const BASE_URL = "http://localhost:3008/players";
 
-async function createPlayer(player) {
+async function createPlayer(name) {
   try {
     const res = await fetch(BASE_URL, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ player }),
+      body: JSON.stringify({name}),
     });
     return await res.json();
   } catch (err) {
     console.log("error: failed to create player", err.message);
-  }
-}
-
-async function getPlayerStats(player) {
-  try {
-    const res = await fetch(`${BASE_URL}/${player}`);
-    return await res.json();
-  } catch (err) {
-    console.log("error: failed to get player", err.message);
+    throw err;
   }
 }
 
@@ -31,12 +25,12 @@ async function getLeaderboard() {
   }
 }
 
-async function submitScore(player, riddleId, time) {
+async function submitScore(name, riddleId, time) {
   try {
     const res = await fetch(`${BASE_URL}/submit-score`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ player, riddleId, time }),
+      body: JSON.stringify({ name, riddleId, time }),
     });
     return await res.json();
   } catch (err) {
@@ -44,4 +38,4 @@ async function submitScore(player, riddleId, time) {
   }
 }
 
-export { createPlayer, getPlayerStats, getLeaderboard, submitScore };
+export { createPlayer, getLeaderboard, submitScore };

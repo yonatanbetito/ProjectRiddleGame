@@ -1,6 +1,6 @@
 import {
   readAllPlayers,
-  readPlayerByUsername,
+  readPlayerByName,
   addPlayerToDB,
   addScoreToPlayer,
   getLeaderboard,
@@ -16,20 +16,16 @@ async function allPlayers(req, res) {
 }
 
 async function newPlayer(req, res) {
-  const { player } = req.body;
-
-  if (!player) {
-    return res.status(400).send({ error: "player required" });
-  }
-
+  const { name } = req.body;
+  if (!name) return res.status(400).send({ error: "name required" });
   try {
-    const existingPlayer = await readPlayerByUsername(player);
+    const existingPlayer = await readPlayerByName(name);
     if (existingPlayer) {
-      return res.json({ player });
+      return res.json(existingPlayer);
     }
 
     const newPlayerData = {
-      username: player,
+      name: name,
       scores: [],
       best_time: null,
       totalGames: 0,
@@ -44,40 +40,36 @@ async function newPlayer(req, res) {
 }
 
 async function playerByName(req, res) {
-  let player = req.params.player;
   try {
-    const playerData = await readPlayerByUsername(player);
-
-    if (!playerData) {
-      return res.status(404).json({ error: "not found" });
-    }
-
-    res.json(playerData);
-  } catch {
-    res.status(500).send({ error: "server error" });
+    const player = await readPlayerByName(req.params.player);
+    if (!player) return res.status(404).json({ error: "not found" });
+    res.json(player);
+  } catch (err) {
+    console.log("error server");
+    res.status(500).send({ error: err.message});
   }
 }
 
 async function addScore(req, res) {
-  const { player, riddleId, time } = req.body;
-
+  const { name, riddleId, time } = req.body;
   try {
-    const playerData = await readPlayerByUsername(player);
-
+    const playerData = await readPlayerByName(name);
     if (!playerData) {
       return res.status(404).json({ error: "not found" });
     }
-
     const score = {
       riddleId,
       time,
       date: new Date(),
     };
-
-    const result = await addScoreToPlayer(player, score);
-    res.json({ message: "best score saved", player: result });
-  } catch {
-    res.status(400).send({ error: "not save score" });
+    const result = await addScoreToPlayer(name, score);
+    if (!result) {
+      return res.status(404).json({ error: "player not found" });
+    }
+    res.json({ message: "best score saved", name: result });
+  } catch (err) {
+    console.log("error server");
+    res.status(400).send({ error: err.message,});
   }
 }
 
@@ -85,8 +77,9 @@ async function leaderboard(req, res) {
   try {
     const players = await getLeaderboard();
     res.json(players);
-  } catch {
-    res.status(500).send({ error: "server error" });
+  } catch (err){
+    console.log("error server");
+    res.status(500).send({ error: err.message });
   }
 }
 
